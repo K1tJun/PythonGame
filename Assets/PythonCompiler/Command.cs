@@ -26,3 +26,9 @@ public class For : Command
     public List<Command> Body = new List<Command>();
 }
 
+public class ExecutionFrame
+{
+    public For loop;
+    public int Iteration;
+    public int commandIndex;
+}
