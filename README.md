@@ -1,5 +1,5 @@
 # PythonGame
-Tor Python Compiler Game
+Python: Code Mission
 
 The game is an educational project designed to teach the fundamentals of Python through interactive gameplay. Players control a robot using code and complete tasks by employing variables, conditionals, loops, functions, and other basic Python constructs.
 
