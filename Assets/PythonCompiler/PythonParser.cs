@@ -9,26 +9,32 @@ public class PythonParser : MonoBehaviour
 {
     public PyroController _pyroController;
 
-    List<Command> commands = new List<Command>();
-    List<int> commandSpace = new List<int>();
+    List<Command> code = new List<Command>();
+    List<int> codeSpace = new List<int>();
 
-    int lineIndex = 0;
+    List<Command> enterCode = new List<Command>();
+    Stack<ExecutionFrame> frame = new Stack<ExecutionFrame>();
+
+    int currentCommandIndex = 0;
 
 
     public void chekTokens(string[] line)
     {
-        commandSpace.Clear();
-        commands.Clear();
+        codeSpace.Clear();
+        code.Clear();
+        enterCode.Clear();
 
-        lineIndex = 0;
+        currentCommandIndex = 0;
 
-        for(int i = 0; i < line.Length; i++)
+        for (int i = 0; i < line.Length; i++)
         {
             if (line[i].Trim().StartsWith("robot."))
                 ChekFun(line[i]);
             else if (line[i].Trim().StartsWith("for"))
                 ChekFor(line[i]);
         }
+
+        AST();
     }
 
     private void ChekFun(string getLine)
@@ -37,7 +43,7 @@ public class PythonParser : MonoBehaviour
 
         string[] _line = getLine.Trim().Split(".");
 
-        switch (_line[1]) 
+        switch (_line[1])
         {
             case "move":
                 Move move = new Move();
@@ -45,29 +51,29 @@ public class PythonParser : MonoBehaviour
                 {
                     case "forward()":
                         move.Direction = PyroCommand.MoveDirection.forward;
-                        commands.Add(move);
-                        commandSpace.Add(trim);
+                        code.Add(move);
+                        codeSpace.Add(trim);
                         break;
                     case "backward()":
                         move.Direction = PyroCommand.MoveDirection.backward;
-                        commands.Add(move);
-                        commandSpace.Add(trim);
+                        code.Add(move);
+                        codeSpace.Add(trim);
                         break;
                 }
                 break;
             case "rotate":
                 Rotate rotate = new Rotate();
                 switch (_line[2])
-                {               
+                {
                     case "right()":
                         rotate.Direction = PyroCommand.RotateDirection.right;
-                        commands.Add(rotate);
-                        commandSpace.Add(trim);
+                        code.Add(rotate);
+                        codeSpace.Add(trim);
                         break;
                     case "left()":
                         rotate.Direction = PyroCommand.RotateDirection.left;
-                        commands.Add(rotate);
-                        commandSpace.Add(trim);
+                        code.Add(rotate);
+                        codeSpace.Add(trim);
                         break;
                 }
                 break;
@@ -97,16 +103,17 @@ public class PythonParser : MonoBehaviour
                     string numberText = line[3].Substring(start + 1, end - start - 1);
 
                     _for.Count = int.Parse(numberText);
+                    _for.Ident = trim;
 
-                    commands.Add(_for);
-                    commandSpace.Add(trim);
+                    code.Add(_for);
+                    codeSpace.Add(trim);
                 }
             }
         }
     }
 
 
-    private void functions(Command fun)
+    private void ExecuteFunctions(Command fun)
     {
         if (fun is Move move)
             _pyroController.Move(move.Direction);
@@ -114,25 +121,141 @@ public class PythonParser : MonoBehaviour
             _pyroController.Rotate(rotate.Direction);
     }
 
-
-    private void Update()
+    private void ExecuteFor(Command _for)
     {
-        if(commands != null)
-        {
-            if (commands.Count >= lineIndex + 1 && !_pyroController.IsBusy)
-            {
-                if (commands[lineIndex] is Move or Rotate)
-                    functions(commands[lineIndex]);
 
-                Debug.Log(commands[lineIndex] + " space: " + commandSpace[lineIndex]);
-                lineIndex++;
+    }
+
+
+
+    private void AST() //Abstract Syntax Tree
+    {
+        Stack<For> forStack = new Stack<For>();
+
+        for(int i = 0; i < code.Count; i++)
+        {
+            int ident = codeSpace[i];
+
+            while (forStack.Count > 0 &&
+                ident <= forStack.Peek().Ident)
+            {
+                forStack.Pop();
+            } 
+
+            if(code[i] is For newFor)
+            {
+                if (forStack.Count > 0)
+                    forStack.Peek().Body.Add(code[i]);
+                else
+                    enterCode.Add(code[i]);
+
+                forStack.Push(newFor);
+            }
+            else
+            {
+                if (forStack.Count > 0)
+                    forStack.Peek().Body.Add(code[i]);
+                else
+                    enterCode.Add(code[i]);
             }
         }
 
 
-        if (Keyboard.current.pKey.wasPressedThisFrame)
+    }
+
+
+    private void Update()
+    {
+        Debuger();
+
+        Executer();
+    }
+
+    private void Executer()
+    {
+        if (_pyroController.IsBusy)
+            return;
+
+        if (enterCode.Count <= currentCommandIndex)
+            return;
+
+        Command enterCommand = enterCode[currentCommandIndex];
+
+
+        if (enterCommand is Rotate or Move)
         {
-            Debug.Log(string.Join(" ,", commands));
+            ExecuteFunctions(enterCommand);
+            currentCommandIndex++;
+        }
+
+        else if (enterCommand is For enterFor)
+        {
+            if(frame.Count == 0)
+            {
+                ExecutionFrame _newFrame = new();
+                _newFrame.loop = enterFor;
+
+                frame.Push(_newFrame);
+            }
+
+
+
+            if (frame.Count > 0)
+            {
+                ExecutionFrame currentFrame = frame.Peek();
+
+                if (currentFrame.loop.Count > currentFrame.Iteration)
+                {
+                    if (currentFrame.loop.Body.Count > currentFrame.commandIndex)
+                    {
+                        Command currentCommand = currentFrame.loop.Body[currentFrame.commandIndex];
+                        if (currentCommand is Move or Rotate)
+                        {
+                            ExecuteFunctions(currentCommand);
+                            currentFrame.commandIndex++;
+                        }
+                        else if (currentCommand is For newFor)
+                        {
+                            ExecutionFrame newFrame = new();
+                            newFrame.loop = newFor;
+
+                            frame.Push(newFrame);
+                            currentFrame.commandIndex++;
+                        }
+                    }
+                    else
+                    {
+                        currentFrame.commandIndex = 0;
+                        currentFrame.Iteration++;
+                    }
+                }
+                else
+                {
+                    frame.Pop();
+
+                    if (frame.Count == 0)
+                        currentCommandIndex++;
+                }
+            }
+        }
+    }
+
+    private void Debuger()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Debug.Log(string.Join(" ,", code));
+        }
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            foreach (var codeLine in code)
+            {
+                if (codeLine is For forLine)
+                {
+                    Debug.Log(forLine.Variable + "  " + forLine.Count + "  " + string.Join(" ,", forLine.Body));
+                    //Debug.Log(string.Join(" ,", forLine.Body));
+                }
+            }
         }
     }
 }
