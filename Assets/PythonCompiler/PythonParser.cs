@@ -121,10 +121,7 @@ public class PythonParser : MonoBehaviour
             _pyroController.Rotate(rotate.Direction);
     }
 
-    private void ExecuteFor(Command _for)
-    {
 
-    }
 
 
 
@@ -182,7 +179,7 @@ public class PythonParser : MonoBehaviour
         Command enterCommand = enterCode[currentCommandIndex];
 
 
-        if (enterCommand is Rotate or Move)
+        if (enterCommand is Function)
         {
             ExecuteFunctions(enterCommand);
             currentCommandIndex++;
@@ -209,7 +206,7 @@ public class PythonParser : MonoBehaviour
                     if (currentFrame.loop.Body.Count > currentFrame.commandIndex)
                     {
                         Command currentCommand = currentFrame.loop.Body[currentFrame.commandIndex];
-                        if (currentCommand is Move or Rotate)
+                        if (currentCommand is Function)
                         {
                             ExecuteFunctions(currentCommand);
                             currentFrame.commandIndex++;
