@@ -2,18 +2,17 @@ using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class Command
-{
+public abstract class Command {}
 
-}
+public abstract class Function {}
 
 
-public class Move : Command
+public class Move : Function
 { 
     public PyroCommand.MoveDirection Direction;
 }
 
-public class Rotate : Command
+public class Rotate : Function
 {
     public PyroCommand.RotateDirection Direction;
 }
