@@ -1,8 +1,7 @@
-using NUnit.Framework.Constraints;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 public class PythonParser : MonoBehaviour
@@ -32,11 +31,13 @@ public class PythonParser : MonoBehaviour
         for (int i = 0; i < line.Length; i++)
         {
             string[] pieceLine = line[i].Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    
+
             if (line[i].Trim().StartsWith("robot."))
                 ChekFun(line[i]);
             else if (line[i].Trim().StartsWith("for"))
                 ChekFor(line[i]);
+            else if (line[i].Trim().StartsWith("if"))
+                ChekIf(line[i]);
 
             // Variables
             else if (pieceLine.Length > 1)
@@ -97,7 +98,7 @@ public class PythonParser : MonoBehaviour
     private void ChekFor(string getLine)
     {
         int trim = getLine.Length - getLine.TrimStart().Length;
-        string[] line = getLine.Trim().Split(" ");
+        string[] line = getLine.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
         if (line.Length == 4)
         {
@@ -114,7 +115,11 @@ public class PythonParser : MonoBehaviour
 
                     string numberText = line[3].Substring(start + 1, end - start - 1);
 
-                    _for.Count = int.Parse(numberText);
+                    if (int.TryParse(numberText, out int intNumberText))
+                        _for.Count = intNumberText;
+                    else if (Variables.ContainsKey(numberText))
+                        _for.Count = Variables[numberText];
+
                     _for.Ident = trim;
 
                     code.Add(_for);
@@ -122,6 +127,39 @@ public class PythonParser : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void ChekIf(string getLine)
+    {
+        int trim = getLine.Length - getLine.TrimStart().Length;
+        string[] line = getLine.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        if (line.Length != 4 || !line[3].EndsWith(":"))
+            return;
+
+        string[] operators = { "<", ">", "==", "<=", ">=" };
+
+        if (!operators.Contains(line[2]))
+            return;
+
+        string left = line[1];
+        string right = line[3].TrimEnd(':');
+
+        if (!int.TryParse(left, out int _x_) && !Variables.ContainsKey(left))
+            return;
+        if (!int.TryParse(right, out _x_) && !Variables.ContainsKey(right))
+            return;
+
+        If newIf = new();
+
+        newIf.op = line[2];
+        newIf.Left = left;
+        newIf.Right = right;
+
+        newIf.Ident = trim;
+
+        code.Add(newIf);
+        codeSpace.Add(trim);
     }
 
     
@@ -149,13 +187,6 @@ public class PythonParser : MonoBehaviour
     
 
 
-    private void ExecuteFunctions(Command fun)
-    {
-        if (fun is Move move)
-            _pyroController.Move(move.Direction);
-        else if (fun is Rotate rotate)
-            _pyroController.Rotate(rotate.Direction);
-    }
 
 
 
@@ -164,30 +195,31 @@ public class PythonParser : MonoBehaviour
     private void AST() //Abstract Syntax Tree
     {
         Stack<For> forStack = new Stack<For>();
+        Stack<Block> blockStack = new Stack<Block>();
 
         for(int i = 0; i < code.Count; i++)
         {
             int ident = codeSpace[i];
 
-            while (forStack.Count > 0 &&
-                ident <= forStack.Peek().Ident)
+            while (blockStack.Count > 0 &&
+                ident <= blockStack.Peek().Ident)
             {
-                forStack.Pop();
-            } 
+                blockStack.Pop();
+            }
 
-            if(code[i] is For newFor)
+            if (code[i] is Block newBlock)
             {
-                if (forStack.Count > 0)
-                    forStack.Peek().Body.Add(code[i]);
+                if (blockStack.Count > 0)
+                    blockStack.Peek().Body.Add(code[i]);
                 else
                     enterCode.Add(code[i]);
 
-                forStack.Push(newFor);
+                blockStack.Push(newBlock);
             }
             else
             {
-                if (forStack.Count > 0)
-                    forStack.Peek().Body.Add(code[i]);
+                if (blockStack.Count > 0)
+                    blockStack.Peek().Body.Add(code[i]);
                 else
                     enterCode.Add(code[i]);
             }
@@ -221,55 +253,24 @@ public class PythonParser : MonoBehaviour
             currentCommandIndex++;
         }
 
-        else if (enterCommand is For enterFor)
+        else if (enterCommand is Block enterBlock)
         {
             if(frame.Count == 0)
             {
                 ExecutionFrame _newFrame = new();
-                _newFrame.loop = enterFor;
+                _newFrame.block = enterBlock;
 
                 frame.Push(_newFrame);
             }
 
 
 
-            if (frame.Count > 0)
-            {
-                ExecutionFrame currentFrame = frame.Peek();
+            ExecutionFrame currentFrame = frame.Peek();
 
-                if (currentFrame.loop.Count > currentFrame.Iteration)
-                {
-                    if (currentFrame.loop.Body.Count > currentFrame.commandIndex)
-                    {
-                        Command currentCommand = currentFrame.loop.Body[currentFrame.commandIndex];
-                        if (currentCommand is Function)
-                        {
-                            ExecuteFunctions(currentCommand);
-                            currentFrame.commandIndex++;
-                        }
-                        else if (currentCommand is For newFor)
-                        {
-                            ExecutionFrame newFrame = new();
-                            newFrame.loop = newFor;
-
-                            frame.Push(newFrame);
-                            currentFrame.commandIndex++;
-                        }
-                    }
-                    else
-                    {
-                        currentFrame.commandIndex = 0;
-                        currentFrame.Iteration++;
-                    }
-                }
-                else
-                {
-                    frame.Pop();
-
-                    if (frame.Count == 0)
-                        currentCommandIndex++;
-                }
-            }
+            if (currentFrame.block is For currentFor)
+                ExecuteFor(currentFrame, currentFor);
+            else if (currentFrame.block is If currentIf)
+                ExecuteIf(currentFrame, currentIf);
         }
 
 
@@ -278,6 +279,147 @@ public class PythonParser : MonoBehaviour
             currentCommandIndex++;
     }
 
+
+    private void ExecuteFunctions(Command fun)
+    {
+        if (fun is Move move)
+            _pyroController.Move(move.Direction);
+        else if (fun is Rotate rotate)
+            _pyroController.Rotate(rotate.Direction);
+    }
+
+    private void ExecuteFor(ExecutionFrame currentFrame, For currentFor)
+    {
+        if (currentFor.Count > currentFrame.Iteration)
+        {
+            if (currentFrame.block.Body.Count > currentFrame.commandIndex)
+            {
+                Command currentCommand = currentFrame.block.Body[currentFrame.commandIndex];
+
+                EndExecute(currentCommand, currentFrame);
+            }
+            else
+            {
+                currentFrame.commandIndex = 0;
+                currentFrame.Iteration++;
+            }
+        }
+        else
+        {
+            frame.Pop();
+
+            if (frame.Count == 0)
+                currentCommandIndex++;
+        }
+    }
+
+    private void ExecuteIf(ExecutionFrame currentFrame, If currentIf)
+    {
+        if(currentFrame.block.Body.Count > currentFrame.commandIndex)
+        {
+            if(ChekIfCondition(currentIf.Left, currentIf.op, currentIf.Right) || currentFrame.commandIndex > 0)
+            {
+                Command currentCommand = currentFrame.block.Body[currentFrame.commandIndex];
+
+                EndExecute(currentCommand, currentFrame);
+            }
+            else
+            {
+                frame.Pop();
+
+                if (frame.Count == 0)
+                    currentCommandIndex++;
+            }
+        }
+        else
+        {
+            frame.Pop();
+
+            if (frame.Count == 0)
+                currentCommandIndex++;
+        }
+    }
+    bool ChekIfCondition(string strLeft, string oper, string strRight)
+    {
+        int left;
+        int right;
+
+
+        if (int.TryParse(strLeft, out int intLeft))
+            left = intLeft;
+        else
+            left = Variables[strLeft];
+
+        if (int.TryParse(strRight, out int intRight))
+            right = intRight;
+        else
+            right = Variables[strRight];
+
+        switch (oper) 
+        {
+            case "<":
+                if (left < right)
+                    return true;
+                else
+                    return false;
+
+            case ">":
+                if (left > right)
+                    return true;
+                else
+                    return false;
+
+            case "<=":
+                if (left <= right)
+                    return true;
+                else
+                    return false;
+
+            case ">=":
+                if (left >= right)
+                    return true;
+                else
+                    return false;
+
+            case "==":
+                if (left == right)
+                    return true;
+                else
+                    return false;
+
+            default:
+                return false;
+        }
+
+    }
+
+
+    private void EndExecute(Command currentCommand, ExecutionFrame currentFrame)
+    {
+        if (currentCommand is Function)
+        {
+            ExecuteFunctions(currentCommand);
+            currentFrame.commandIndex++;
+        }
+        else if (currentCommand is For newFor)
+        {
+            ExecutionFrame newFrame = new();
+            newFrame.block = newFor;
+
+            frame.Push(newFrame);
+            currentFrame.commandIndex++;
+        }
+        else if (currentCommand is If newIf)
+        {
+            ExecutionFrame newFrame = new();
+            newFrame.block = newIf;
+
+            frame.Push(newFrame);
+            currentFrame.commandIndex++;
+        }
+    }
+
+    
     private void Debuger()
     {
         if (Input.GetKeyDown(KeyCode.P))
@@ -297,4 +439,3 @@ public class PythonParser : MonoBehaviour
         }
     }
 }
-
