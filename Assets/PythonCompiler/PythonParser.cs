@@ -18,6 +18,9 @@ public class PythonParser : MonoBehaviour
     int currentCommandIndex = 0;
 
 
+    Dictionary<string, int> Variables = new Dictionary<string, int>();
+
+
     public void chekTokens(string[] line)
     {
         codeSpace.Clear();
@@ -28,10 +31,19 @@ public class PythonParser : MonoBehaviour
 
         for (int i = 0; i < line.Length; i++)
         {
+            string[] pieceLine = line[i].Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    
             if (line[i].Trim().StartsWith("robot."))
                 ChekFun(line[i]);
             else if (line[i].Trim().StartsWith("for"))
                 ChekFor(line[i]);
+
+            // Variables
+            else if (pieceLine.Length > 1)
+            {
+                if (pieceLine[1] == "=")
+                    ChekVariable(line[i]);
+            }
         }
 
         AST();
@@ -111,6 +123,30 @@ public class PythonParser : MonoBehaviour
             }
         }
     }
+
+    
+    private void ChekVariable(string getLine)
+    {
+        int trim = getLine.Length - getLine.TrimStart().Length;
+
+        string[] _line = getLine.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        if(_line.Length == 3)
+        {
+            if(int.TryParse(_line[2], out int value) && !int.TryParse(_line[0], out int _x_))
+            {
+                Variable newVariable = new Variable();
+                newVariable.name = _line[0];
+                newVariable.value = value;
+
+                code.Add(newVariable);
+                codeSpace.Add(trim);
+
+                Variables[_line[0]] = value;
+            }
+        }
+    }
+    
 
 
     private void ExecuteFunctions(Command fun)
@@ -235,6 +271,11 @@ public class PythonParser : MonoBehaviour
                 }
             }
         }
+
+
+        // костыль for variable
+        else
+            currentCommandIndex++;
     }
 
     private void Debuger()
