@@ -25,6 +25,13 @@ public class For : Command
     public List<Command> Body = new List<Command>();
 }
 
+public class Variable : Command 
+{
+    public string name;
+    public int value;
+}
+
+
 public class ExecutionFrame
 {
     public For loop;
