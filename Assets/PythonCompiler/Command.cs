@@ -1,14 +1,20 @@
-using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class Command {}
+public abstract class Command { }
 
-public abstract class Function {}
+public abstract class Function : Command { }
+
+public abstract class Block : Command 
+{
+    public int Ident;
+    public List<Command> Body = new List<Command>();
+}
+
 
 
 public class Move : Function
-{ 
+{
     public PyroCommand.MoveDirection Direction;
 }
 
@@ -17,13 +23,20 @@ public class Rotate : Function
     public PyroCommand.RotateDirection Direction;
 }
 
-public class For : Command 
+
+public class For : Block
 {
     public string Variable;
     public int Count;
-    public int Ident;
-    public List<Command> Body = new List<Command>();
 }
+
+public class If : Block
+{
+    public string Left;
+    public string op;
+    public string Right;
+}
+
 
 public class Variable : Command 
 {
@@ -34,7 +47,7 @@ public class Variable : Command
 
 public class ExecutionFrame
 {
-    public For loop;
+    public Block block;
     public int Iteration;
     public int commandIndex;
 }
