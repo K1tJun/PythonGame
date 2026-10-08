@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
+using UnityEngine.InputSystem;
 
 public class PythonParser : MonoBehaviour
 {
@@ -422,18 +422,21 @@ public class PythonParser : MonoBehaviour
     
     private void Debuger()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Keyboard.current.spaceKey.isPressed)
         {
-            Debug.Log(string.Join(" ,", code));
-        }
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            foreach (var codeLine in code)
+            if (Keyboard.current.pKey.wasPressedThisFrame)
             {
-                if (codeLine is For forLine)
+                Debug.Log(string.Join(" ,", code));
+            }
+            if (Keyboard.current.lKey.wasPressedThisFrame)
+            {
+                foreach (var codeLine in code)
                 {
-                    Debug.Log(forLine.Variable + "  " + forLine.Count + "  " + string.Join(" ,", forLine.Body));
-                    //Debug.Log(string.Join(" ,", forLine.Body));
+                    if (codeLine is For forLine)
+                    {
+                        Debug.Log(forLine.Variable + "  " + forLine.Count + "  " + string.Join(" ,", forLine.Body));
+                        //Debug.Log(string.Join(" ,", forLine.Body));
+                    }
                 }
             }
         }
