@@ -1050,6 +1050,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cdd73ffcf2355947b2dc1065932cc15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PythonParser
+  holdSpace: {fileID: 2672016751246948783, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  pressL: {fileID: 211698025393270099, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   _pyroController: {fileID: 8126853357123278475}
 --- !u!114 &850538347
 MonoBehaviour:

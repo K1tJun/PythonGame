@@ -1,5 +1,6 @@
 {
-    "name": "InputSystem_Actions",
+    "version": 1,
+    "name": "GameInput",
     "maps": [
         {
             "name": "Player",
@@ -986,6 +987,54 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Debuger",
+            "id": "f2e0693b-241e-499e-a019-b13ec18692d2",
+            "actions": [
+                {
+                    "name": "holdSpace",
+                    "type": "Button",
+                    "id": "62b519dc-8d49-4dd6-afcb-3e042c60b17a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "pressP",
+                    "type": "Button",
+                    "id": "c7c8f0c4-fff5-464e-8ca9-39a01d879172",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8eafad79-9925-4ed8-a705-a0fe5df63ace",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "holdSpace",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1772a301-880b-465a-8e68-01ecc9ed202e",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "pressP",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

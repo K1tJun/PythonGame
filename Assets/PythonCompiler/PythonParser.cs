@@ -6,6 +6,15 @@ using UnityEngine.InputSystem;
 
 public class PythonParser : MonoBehaviour
 {
+    [Header("Input")]
+    public InputActionReference holdSpace;
+    public InputActionReference pressL;
+
+
+
+    [Space(20)]
+    [Header("Components")]
+
     public PyroController _pyroController;
 
     List<Command> code = new List<Command>();
@@ -231,8 +240,6 @@ public class PythonParser : MonoBehaviour
 
     private void Update()
     {
-        Debuger();
-
         Executer();
     }
 
@@ -420,24 +427,36 @@ public class PythonParser : MonoBehaviour
     }
 
     
-    private void Debuger()
+
+
+
+
+
+    //Input Action
+
+    private void OnEnable()
     {
-        if (Keyboard.current.spaceKey.isPressed)
+        holdSpace.action.Enable();
+
+        pressL.action.performed += OnalgPressed;
+        pressL.action.Enable();
+    }
+
+    private void OnDisable()
+    {
+        pressL.action.performed -= OnalgPressed;
+
+        holdSpace.action.Disable();
+        pressL.action.Disable();
+    }
+
+    private void OnalgPressed(InputAction.CallbackContext context)
+    {
+        if (holdSpace.action.IsPressed())
         {
             if (Keyboard.current.pKey.wasPressedThisFrame)
             {
                 Debug.Log(string.Join(" ,", code));
-            }
-            if (Keyboard.current.lKey.wasPressedThisFrame)
-            {
-                foreach (var codeLine in code)
-                {
-                    if (codeLine is For forLine)
-                    {
-                        Debug.Log(forLine.Variable + "  " + forLine.Count + "  " + string.Join(" ,", forLine.Body));
-                        //Debug.Log(string.Join(" ,", forLine.Body));
-                    }
-                }
             }
         }
     }
