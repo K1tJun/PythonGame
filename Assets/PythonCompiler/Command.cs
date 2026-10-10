@@ -1,4 +1,3 @@
-using UnityEngine;
 using System.Collections.Generic;
 
 public abstract class Command { }
@@ -37,6 +36,17 @@ public class If : Block
     public string Right;
 }
 
+public class FunctionDefinition : Block 
+{
+    public string name;
+}
+public class FunctionCall : Block 
+{
+    public string name;
+}
+
+
+
 
 public class Variable : Command 
 {
@@ -51,3 +61,4 @@ public class ExecutionFrame
     public int Iteration;
     public int commandIndex;
 }
+
