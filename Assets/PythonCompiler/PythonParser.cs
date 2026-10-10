@@ -2,19 +2,10 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public class PythonParser : MonoBehaviour
 {
-    [Header("Input")]
-    public InputActionReference holdSpace;
-    public InputActionReference pressL;
-
-
-
-    [Space(20)]
-    [Header("Components")]
-
     public PyroController _pyroController;
 
     List<Command> code = new List<Command>();
@@ -28,6 +19,8 @@ public class PythonParser : MonoBehaviour
 
     Dictionary<string, int> Variables = new Dictionary<string, int>();
 
+    Dictionary<string, FunctionDefinition> localFunctions = new Dictionary<string, FunctionDefinition>();
+
 
     public void chekTokens(string[] line)
     {
@@ -40,6 +33,7 @@ public class PythonParser : MonoBehaviour
         for (int i = 0; i < line.Length; i++)
         {
             string[] pieceLine = line[i].Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] funPieceLine = (line[i].Trim().Split(new[] { '(' }, StringSplitOptions.RemoveEmptyEntries));
 
             if (line[i].Trim().StartsWith("robot."))
                 ChekFun(line[i]);
@@ -47,6 +41,13 @@ public class PythonParser : MonoBehaviour
                 ChekFor(line[i]);
             else if (line[i].Trim().StartsWith("if"))
                 ChekIf(line[i]);
+            else if (line[i].Trim().StartsWith("def"))
+                ChekDefinFun(line[i]);
+
+
+            else if (funPieceLine.Length > 1) // Out of Array   ERROR
+                ChekCallFun(line[i]);
+
 
             // Variables
             else if (pieceLine.Length > 1)
@@ -171,6 +172,55 @@ public class PythonParser : MonoBehaviour
         codeSpace.Add(trim);
     }
 
+    private void ChekDefinFun(string getLine)
+    {
+        int indexInLineDef = 0;
+
+        int trim = getLine.Length - getLine.TrimStart().Length;
+
+        string[] line = getLine.Trim().Split(new[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
+
+        if (line.Length == 3)
+            indexInLineDef++;
+            
+
+        if (line.Length < 2 && line.Length > 3)
+            return;
+        if (!getLine.Trim().EndsWith(":"))
+            return;
+        string[] defFun = line[0].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        if (defFun.Length != 2)
+            return;
+
+        FunctionDefinition newUFun = new();
+
+        newUFun.name = defFun[1];
+
+        code.Add(newUFun);
+        codeSpace.Add(trim);
+
+        localFunctions[defFun[1]] = newUFun;
+    }
+    private void ChekCallFun(string getLine)
+    {
+        int trim = getLine.Length - getLine.TrimStart().Length;
+
+        string[] line = getLine.Trim().Split(new[] { '(', ')' });
+
+        if (!getLine.EndsWith(")"))
+            return;
+
+        if (line.Length == 1)
+            return;
+
+        FunctionCall newCallFun = new();
+
+        newCallFun.name = line[0];
+
+        code.Add(newCallFun);
+        codeSpace.Add(trim);
+    }
+
     
     private void ChekVariable(string getLine)
     {
@@ -218,8 +268,13 @@ public class PythonParser : MonoBehaviour
 
             if (code[i] is Block newBlock)
             {
-                if (blockStack.Count > 0)
+                if (blockStack.Count > 0 && newBlock is FunctionDefinition == false)
                     blockStack.Peek().Body.Add(code[i]);
+                else if (newBlock is FunctionDefinition newDefFun)
+                    if (blockStack.Count == 0)
+                        blockStack.Push(newBlock);
+                    else
+                       Debug.LogError(newDefFun.name + " - функция не объявлена");               //Заглушка
                 else
                     enterCode.Add(code[i]);
 
@@ -264,6 +319,9 @@ public class PythonParser : MonoBehaviour
         {
             if(frame.Count == 0)
             {
+                if (enterBlock is FunctionDefinition)
+                    return;
+
                 ExecutionFrame _newFrame = new();
                 _newFrame.block = enterBlock;
 
@@ -278,6 +336,8 @@ public class PythonParser : MonoBehaviour
                 ExecuteFor(currentFrame, currentFor);
             else if (currentFrame.block is If currentIf)
                 ExecuteIf(currentFrame, currentIf);
+            else if (currentFrame.block is FunctionCall currentDef)
+                ExecuteUserFunction(currentFrame, currentDef);
         }
 
 
@@ -400,6 +460,27 @@ public class PythonParser : MonoBehaviour
 
     }
 
+    private void ExecuteUserFunction(ExecutionFrame currentFrame, FunctionCall currentDef)
+    {
+        if(currentFrame.commandIndex == 0)
+        {
+            currentDef.Body = localFunctions[currentDef.name].Body;
+        }
+        if(currentFrame.block.Body.Count > currentFrame.commandIndex)
+        {
+            Command currentCommand = currentFrame.block.Body[currentFrame.commandIndex];
+
+            EndExecute(currentCommand, currentFrame);
+        }
+        else
+        {
+            frame.Pop();
+            if (frame.Count == 0)
+                currentCommandIndex++;
+        }
+    }
+
+
 
     private void EndExecute(Command currentCommand, ExecutionFrame currentFrame)
     {
@@ -420,6 +501,14 @@ public class PythonParser : MonoBehaviour
         {
             ExecutionFrame newFrame = new();
             newFrame.block = newIf;
+
+            frame.Push(newFrame);
+            currentFrame.commandIndex++;
+        }
+        else if (currentCommand is FunctionCall newFunCall)
+        {
+            ExecutionFrame newFrame = new();
+            newFrame.block = newFunCall;
 
             frame.Push(newFrame);
             currentFrame.commandIndex++;
