@@ -2,11 +2,23 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 public class PythonParser : MonoBehaviour
 {
+    [Header("Input")]
+    public InputActionReference holdSpace;
+    public InputActionReference pressL;
+
+
+
+    [Space(20)]
+    [Header("Components")]
+
     public PyroController _pyroController;
+
+
 
     List<Command> code = new List<Command>();
     List<int> codeSpace = new List<int>();
@@ -527,19 +539,19 @@ public class PythonParser : MonoBehaviour
     {
         holdSpace.action.Enable();
 
-        pressL.action.performed += OnalgPressed;
+        pressL.action.performed += OnPPressed;
         pressL.action.Enable();
     }
 
     private void OnDisable()
     {
-        pressL.action.performed -= OnalgPressed;
+        pressL.action.performed -= OnPPressed;
 
         holdSpace.action.Disable();
         pressL.action.Disable();
     }
 
-    private void OnalgPressed(InputAction.CallbackContext context)
+    private void OnPPressed(InputAction.CallbackContext context)
     {
         if (holdSpace.action.IsPressed())
         {
