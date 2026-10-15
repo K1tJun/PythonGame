@@ -22,6 +22,12 @@ public class Rotate : Function
     public PyroCommand.RotateDirection Direction;
 }
 
+public class pickAndDrop : Function 
+{
+    public PyroCommand.pickAndDropDirection Direction;
+}
+
+
 
 public class For : Block
 {

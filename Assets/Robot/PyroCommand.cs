@@ -14,5 +14,9 @@ public class PyroCommand
         left
     }
 
-
+    public enum pickAndDropDirection
+    {
+        up,
+        drop
+    }
 }

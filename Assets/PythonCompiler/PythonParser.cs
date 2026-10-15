@@ -112,6 +112,19 @@ public class PythonParser : MonoBehaviour
                         break;
                 }
                 break;
+
+            case "pickUp()":
+                pickAndDrop pAd = new pickAndDrop();
+                pAd.Direction = PyroCommand.pickAndDropDirection.up;
+                code.Add(pAd);
+                codeSpace.Add(trim);
+                break;
+            case "drop()":
+                pickAndDrop PaD= new pickAndDrop();
+                PaD.Direction = PyroCommand.pickAndDropDirection.drop;
+                code.Add(PaD);
+                codeSpace.Add(trim);
+                break;
         }
 
 
@@ -361,10 +374,13 @@ public class PythonParser : MonoBehaviour
 
     private void ExecuteFunctions(Command fun)
     {
+        Debug.Log(fun);
         if (fun is Move move)
             _pyroController.Move(move.Direction);
         else if (fun is Rotate rotate)
             _pyroController.Rotate(rotate.Direction);
+        else if (fun is pickAndDrop PaD)
+            _pyroController.PickAndDrop(PaD.Direction);
     }
 
     private void ExecuteFor(ExecutionFrame currentFrame, For currentFor)

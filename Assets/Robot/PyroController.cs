@@ -8,6 +8,7 @@ public class PyroController : MonoBehaviour
     public float twistedUp;
     public float speedOnPick;
     public float speedTwistedUp;
+    public bool twistedIsUp = false;
 
 
     [Space(20)]
@@ -97,16 +98,23 @@ public class PyroController : MonoBehaviour
         }
     }
 
-    [ContextMenu("TestPickUP")]
-    public void PickUpBox()
-    {
-        Debug.Log("button");
 
+    public void PickAndDrop(PyroCommand.pickAndDropDirection dir)
+    {
         if (IsBusy)
             return;
 
-        if (cubeForward == null)
-            return;
+        if (dir == PyroCommand.pickAndDropDirection.up && !twistedIsUp)
+            PickBox();
+        else if(dir == PyroCommand.pickAndDropDirection.drop && twistedIsUp)
+            DropBox();
+    }
+
+    [ContextMenu("TestPickUP")]
+    public void PickBox()
+    {
+        twistedIsUp = true;
+        IsBusy = true;
 
         Vector3 target = pyro.position + transform.forward * moveOnPick;
 
@@ -114,7 +122,8 @@ public class PyroController : MonoBehaviour
             .SetEase(Ease.Linear)
             .OnComplete(() =>
             {
-                cubeForward.parent = twisted;
+                if(cubeForward != null)
+                    cubeForward.parent = twisted;
                 target = twisted.position + twisted.up * twistedUp;
 
                 twisted.DOMove(target, speedTwistedUp)
@@ -137,13 +146,8 @@ public class PyroController : MonoBehaviour
     [ContextMenu("TestDropBox")]
     public void DropBox()
     {
-        Debug.Log("button");
-
-        if (IsBusy)
-            return;
-
-        if (cubeForward == null)
-            return;
+        twistedIsUp = false;
+        IsBusy = true;
 
         Vector3 target = pyro.position + transform.forward * moveOnPick;
 
@@ -157,7 +161,8 @@ public class PyroController : MonoBehaviour
                     .SetEase(Ease.Linear)
                     .OnComplete(() =>
                     {
-                        cubeForward.parent = null;
+                        if (cubeForward != null)
+                            cubeForward.parent = null;
 
                         target = pyro.position - transform.forward * moveOnPick;
 
@@ -173,10 +178,15 @@ public class PyroController : MonoBehaviour
     }
 
 
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform.CompareTag("box"))
             cubeForward = other.transform;
-        Debug.Log(cubeForward);
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.transform == cubeForward && other.transform.parent != twisted.transform)
+            cubeForward = null;
     }
 }

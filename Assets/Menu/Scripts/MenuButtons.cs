@@ -10,7 +10,11 @@ public class MenuButtons : MonoBehaviour
     public void ExitEscapeGame()
     {
         if (SceneManager.GetActiveScene().name == mainMenu)
+        {
             Application.Quit();
+            Debug.Log("A");
+        }
+
 
         else if (SceneManager.GetActiveScene().name == hub)
             SceneManager.LoadScene(mainMenu);
