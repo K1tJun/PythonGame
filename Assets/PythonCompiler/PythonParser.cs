@@ -12,6 +12,11 @@ public class PythonParser : MonoBehaviour
     public InputActionReference pressL;
 
 
+    [Space(20)]
+    [Header("DebugError")]
+    public Errors Er;
+    public ErrorDebug DebugError;
+
 
     [Space(20)]
     [Header("Components")]
@@ -66,6 +71,12 @@ public class PythonParser : MonoBehaviour
             {
                 if (pieceLine[1] == "=")
                     ChekVariable(line[i]);
+            }
+
+
+            else if (line[i].Trim() != "")
+            {
+                DebugError.HighlightLine(i+1, Er.GetError("Неизвостно"));
             }
         }
 
@@ -374,7 +385,6 @@ public class PythonParser : MonoBehaviour
 
     private void ExecuteFunctions(Command fun)
     {
-        Debug.Log(fun);
         if (fun is Move move)
             _pyroController.Move(move.Direction);
         else if (fun is Rotate rotate)

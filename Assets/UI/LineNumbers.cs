@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class LineNumbers : MonoBehaviour
 {
@@ -10,31 +9,44 @@ public class LineNumbers : MonoBehaviour
     private TMP_Text codeText;
     private RectTransform numbersRect;
 
+    private int previousLineCount = -1;
+
     void Start()
     {
         codeText = _input.textComponent;
         numbersRect = GetComponent<RectTransform>();
 
-        _input.onValueChanged.AddListener(UpdateNumbers);
-        UpdateNumbers(_input.text);
-        
+        UpdateNumbersIfNeeded();
     }
 
-    void UpdateNumbers(string input)
+    void Update()
     {
-        int stringsCount = input.Split("\n").Length;
+        UpdateNumbersIfNeeded();
+    }
 
-        text.text = "";
+    void UpdateNumbersIfNeeded()
+    {
+        int stringsCount = _input.text.Split('\n').Length;
 
-        for(int i = 1; i < stringsCount + 1; i++)
+        if (stringsCount == previousLineCount)
+            return;
+
+        previousLineCount = stringsCount;
+
+        System.Text.StringBuilder builder =
+            new System.Text.StringBuilder();
+
+        for (int i = 1; i <= stringsCount; i++)
         {
-            text.text += i.ToString() + "\n";
+            builder.Append(i).Append('\n');
         }
+
+        text.text = builder.ToString();
     }
 
     void LateUpdate()
     {
-        // Синхронизируем прокрутку
+        // Синхронизируем прокрутку номеров и кода
         Vector2 pos = numbersRect.anchoredPosition;
         pos.y = codeText.rectTransform.anchoredPosition.y;
         numbersRect.anchoredPosition = pos;
