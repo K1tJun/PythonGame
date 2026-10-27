@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class ErrorDebug : MonoBehaviour
 {
@@ -35,6 +36,10 @@ public class ErrorDebug : MonoBehaviour
     public float maxAlpha = 1f;
     public float blinkSpeed = 2f;
 
+
+    [Header("Other")]
+    public PythonParser parser;
+
     private void Update()
     {
         if (!blinkEnabled || highlightImage == null)
@@ -60,7 +65,8 @@ public class ErrorDebug : MonoBehaviour
         errorHead = message.errorName;
         errorText = message.description;
         lineNumber = number;
-        Debug.Log("erros");
+
+        parser.hasError = true;
 
         UpdateHighlight();
     }

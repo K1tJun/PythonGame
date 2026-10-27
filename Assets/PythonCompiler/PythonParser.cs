@@ -16,6 +16,7 @@ public class PythonParser : MonoBehaviour
     [Header("DebugError")]
     public Errors Er;
     public ErrorDebug DebugError;
+    public bool hasError = false;
 
 
     [Space(20)]
@@ -24,6 +25,8 @@ public class PythonParser : MonoBehaviour
     public PyroController _pyroController;
 
 
+
+    private bool codeIsDone = false;
 
     List<Command> code = new List<Command>();
     List<int> codeSpace = new List<int>();
@@ -41,6 +44,8 @@ public class PythonParser : MonoBehaviour
 
     public void chekTokens(string[] line)
     {
+        codeIsDone = false;
+        hasError = false;
         codeSpace.Clear();
         code.Clear();
         enterCode.Clear();
@@ -77,10 +82,12 @@ public class PythonParser : MonoBehaviour
             else if (line[i].Trim() != "")
             {
                 DebugError.HighlightLine(i+1, Er.GetError("Неизвостно"));
+                hasError = true;
             }
         }
 
         AST();
+        codeIsDone = true;
     }
 
     private void ChekFun(string getLine)
@@ -257,7 +264,6 @@ public class PythonParser : MonoBehaviour
         codeSpace.Add(trim);
     }
 
-    
     private void ChekVariable(string getLine)
     {
         int trim = getLine.Length - getLine.TrimStart().Length;
@@ -331,7 +337,8 @@ public class PythonParser : MonoBehaviour
 
     private void Update()
     {
-        Executer();
+        if(codeIsDone && !hasError)
+            Executer();
     }
 
     private void Executer()
