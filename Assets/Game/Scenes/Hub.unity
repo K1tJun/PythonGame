@@ -948,14 +948,14 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 868455165}
         m_TargetAssemblyTypeName: MenuButtons, Assembly-CSharp
-        m_MethodName: ExitEscapeGame
-        m_Mode: 1
+        m_MethodName: SetNewScene
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: MainMenu
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &522361624
@@ -1193,8 +1193,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afd44ee2cbf0e9c41a52feaf688b6d0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuButtons
-  mainMenu: MainMenu
-  hub: Hub
 --- !u!1 &1079708244
 GameObject:
   m_ObjectHideFlags: 0

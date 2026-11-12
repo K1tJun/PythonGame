@@ -15,10 +15,19 @@ public class GameManager : MonoBehaviour
     [Header("Targets")] 
     public Vector3 targetRobotPos;
 
-
     private bool targetComplete = false;
-    
-    [Header("targetsComplete")]
+
+    [Header("targetsComplete")] 
+    public RectTransform enterMenu;
+
+    public float waitToEnterMenu;
+    [Space]
+    public float timeEnterMenuAnim;
+    public float endMenuPos;
+    public float durationMenuPosShake;
+    public float timeMenuShake;
+    public float endMenuScale;
+
     
     
     [Space(20)]
@@ -70,15 +79,41 @@ public class GameManager : MonoBehaviour
 
     private void CheckTargets()
     {
-        if (_robot.transform.position == targetRobotPos && _parser.codeDone)
+        if (_robot.transform.position == targetRobotPos && _parser.codeDone && !targetComplete )
         {
             targetComplete = true;
             sData.bulbBlink.levelComplete = true;
+
+            HideLearnPanel();
+
+            StartCoroutine(StartEnterMenu());
         }
     }
 
     
     
+    //Enter Menu
+
+    IEnumerator StartEnterMenu()
+    {
+        yield return new WaitForSeconds(waitToEnterMenu);
+        ShowEnterMenu();
+    }
+    private void ShowEnterMenu()
+    {
+        Sequence menuSeq = DOTween.Sequence();
+
+        menuSeq.Join(enterMenu.DOLocalMoveY(endMenuPos + durationMenuPosShake, timeEnterMenuAnim));
+        menuSeq.Join(enterMenu.DOScale(endMenuScale, timeEnterMenuAnim));
+        menuSeq.Append(enterMenu.DOLocalMoveY(-durationMenuPosShake, timeMenuShake));
+    }
+    
+    
+    
+    
+    
+    
+    //Learn Panel
     
     public void UpdatePage(bool next)
     {
