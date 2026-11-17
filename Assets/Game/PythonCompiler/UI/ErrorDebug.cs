@@ -53,8 +53,7 @@ public class ErrorDebug : MonoBehaviour
     }
 
     public void HighlightLine(int number, ErrorMes message)
-    {
-        // Ноль — скрыть рамку
+    { 
         if (number == 0)
         {
             highlight.gameObject.SetActive(false);
@@ -67,7 +66,8 @@ public class ErrorDebug : MonoBehaviour
         lineNumber = number;
 
         parser.hasError = true;
-
+        parser.errorsCount++;
+        
         UpdateHighlight();
     }
 

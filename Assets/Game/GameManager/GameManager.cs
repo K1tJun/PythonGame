@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
@@ -27,6 +28,10 @@ public class GameManager : MonoBehaviour
     public float durationMenuPosShake;
     public float timeMenuShake;
     public float endMenuScale;
+    [Space]
+    public TextMeshProUGUI numTime;
+    public TextMeshProUGUI numCommands;
+    public TextMeshProUGUI numErrors;
 
     
     
@@ -41,6 +46,7 @@ public class GameManager : MonoBehaviour
     public float startScalePanel;
     public float endScalePanel;
     public float timePanelStart;
+
 
 
     [Header("LearnText")]
@@ -101,11 +107,19 @@ public class GameManager : MonoBehaviour
     }
     private void ShowEnterMenu()
     {
+        SetEnterMenuText();
+        
         Sequence menuSeq = DOTween.Sequence();
 
         menuSeq.Join(enterMenu.DOLocalMoveY(endMenuPos + durationMenuPosShake, timeEnterMenuAnim));
         menuSeq.Join(enterMenu.DOScale(endMenuScale, timeEnterMenuAnim));
         menuSeq.Append(enterMenu.DOLocalMoveY(-durationMenuPosShake, timeMenuShake));
+    }
+    private void SetEnterMenuText()
+    {
+        numTime.text = TimeSpan.FromSeconds(Time.time).ToString(@"m\:ss");
+        numCommands.text = _parser.codeLength.ToString();
+        numErrors.text = _parser.errorsCount.ToString();
     }
     
     

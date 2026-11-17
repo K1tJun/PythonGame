@@ -17,9 +17,11 @@ public class PythonParser : MonoBehaviour
     public Errors Er;
     public ErrorDebug DebugError;
     public bool hasError = false;
+    public int errorsCount;
 
 
     public bool codeDone = false;
+    public int codeLength;
     
     [Space(20)]
     [Header("Components")]
@@ -90,6 +92,7 @@ public class PythonParser : MonoBehaviour
 
         AST();
         codeIsDone = true;
+        codeLength = code.Count;
     }
 
     private void ChekFun(string getLine)
