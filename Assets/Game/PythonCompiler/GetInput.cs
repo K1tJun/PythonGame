@@ -5,6 +5,7 @@ public class GetInput : MonoBehaviour
 {
     public TMP_InputField _inputField;
     public PythonParser parser;
+    public GameManager gManager;
 
     private string UserCode;
 
@@ -17,6 +18,7 @@ public class GetInput : MonoBehaviour
     private void LinesCutter(string _text)
     {
         string[] lines = _text.Split("\n");
-        parser.chekTokens(lines);
+        if(parser.codeDone && !gManager.restartingRob)
+            parser.chekTokens(lines);
     }
 }

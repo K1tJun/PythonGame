@@ -13,10 +13,13 @@ public class GameManager : MonoBehaviour
     public Transform _robot;
     public PythonParser _parser;
 
-    [Header("Targets")] 
-    public Vector3 targetRobotPos;
-
+    [Header("Targets")]
+    public float restartRobTime = 0.5f;
+    
     private bool targetComplete = false;
+    public bool restartingRob = false;
+
+
 
     [Header("targetsComplete")] 
     public RectTransform enterMenu;
@@ -85,7 +88,7 @@ public class GameManager : MonoBehaviour
 
     private void CheckTargets()
     {
-        if (_robot.transform.position == targetRobotPos && _parser.codeDone && !targetComplete )
+        if (_robot.transform.position == sData.robotTargetPosition && _parser.codeDone && !targetComplete )
         {
             targetComplete = true;
             sData.bulbBlink.levelComplete = true;
@@ -94,6 +97,31 @@ public class GameManager : MonoBehaviour
 
             StartCoroutine(StartEnterMenu());
         }
+        else if ((_robot.transform.position != sData.robotPosition 
+                  || _robot.transform.eulerAngles != new Vector3(0, 0, 0)) && 
+                 _parser.codeDone &&
+                 _robot.transform.position != sData.robotTargetPosition && 
+                 !restartingRob)
+        {
+            StartCoroutine(RestartRobot());
+        }
+    }
+
+
+    IEnumerator RestartRobot()
+    {
+        restartingRob = true;
+
+        yield return new WaitForSeconds(1f);
+
+        _robot.transform.DOScale(0f, restartRobTime);
+        yield return new WaitForSeconds(restartRobTime);
+        
+        _robot.transform.position = sData.robotPosition;
+        _robot.transform.eulerAngles = new Vector3(0, 0, 0);
+
+        _robot.transform.DOScale(1f, restartRobTime);
+        restartingRob = false;
     }
 
     

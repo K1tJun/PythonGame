@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 9af23ba5fa5364ff598888460e0e2759, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -225,7 +225,7 @@ Transform:
   m_GameObject: {fileID: 340505931}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.27, y: 0.289, z: -7.3}
+  m_LocalPosition: {x: 1.5019999, y: 0.11400005, z: -7.3}
   m_LocalScale: {x: 3.2016523, y: 1, z: 2.637002}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -253,11 +253,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8862935c050005f4fbee666c67fd71d3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.048
+      value: 0.28
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8862935c050005f4fbee666c67fd71d3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.787
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8862935c050005f4fbee666c67fd71d3, type: 3}
       propertyPath: m_LocalPosition.z
@@ -324,6 +324,7 @@ GameObject:
   - component: {fileID: 1133320513}
   - component: {fileID: 1133320512}
   - component: {fileID: 1133320511}
+  - component: {fileID: 1133320514}
   m_Layer: 5
   m_Name: Exit
   m_TagString: Untagged
@@ -445,6 +446,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1133320509}
   m_CullTransparentMesh: 1
+--- !u!114 &1133320514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133320509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 323619c37337bcb40843d7e6124c3700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HighlightButton
+  hoverScale: 2.4
+  duration: 0.2
 --- !u!1 &1161732908
 GameObject:
   m_ObjectHideFlags: 0
@@ -495,8 +510,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afd44ee2cbf0e9c41a52feaf688b6d0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuButtons
-  mainMenu: MainMenu
-  hub: 
 --- !u!1 &1242798602
 GameObject:
   m_ObjectHideFlags: 0
@@ -693,8 +706,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u0418\u0433\u0440\u0430\u0442\u044C"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: ac02f4fed00244c4b8555f860cbdb737, type: 2}
+  m_sharedMaterial: {fileID: -440235142451227258, guid: ac02f4fed00244c4b8555f860cbdb737, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -718,8 +731,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -788,7 +801,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1649077807
 Light:
   m_ObjectHideFlags: 0
@@ -1012,6 +1025,7 @@ GameObject:
   - component: {fileID: 1747873783}
   - component: {fileID: 1747873782}
   - component: {fileID: 1747873781}
+  - component: {fileID: 1747873784}
   m_Layer: 5
   m_Name: Start
   m_TagString: Untagged
@@ -1133,6 +1147,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1747873779}
   m_CullTransparentMesh: 1
+--- !u!114 &1747873784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747873779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 323619c37337bcb40843d7e6124c3700, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HighlightButton
+  hoverScale: 2.6
+  duration: 0.2
 --- !u!1 &1800985782
 GameObject:
   m_ObjectHideFlags: 0
@@ -1192,8 +1220,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u0412\u044B\u0439\u0442\u0438\n"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: ac02f4fed00244c4b8555f860cbdb737, type: 2}
+  m_sharedMaterial: {fileID: -440235142451227258, guid: ac02f4fed00244c4b8555f860cbdb737, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1217,8 +1245,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
