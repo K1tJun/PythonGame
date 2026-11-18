@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 
 public class PythonParser : MonoBehaviour
 {
+    public bool onlyMoveAndRotate = false;
     [Header("Input")]
     public InputActionReference holdSpace;
     public InputActionReference pressL;
@@ -63,20 +64,20 @@ public class PythonParser : MonoBehaviour
 
             if (line[i].Trim().StartsWith("robot."))
                 ChekFun(line[i]);
-            else if (line[i].Trim().StartsWith("for"))
+            else if (line[i].Trim().StartsWith("for") && !onlyMoveAndRotate)
                 ChekFor(line[i]);
-            else if (line[i].Trim().StartsWith("if"))
+            else if (line[i].Trim().StartsWith("if") && !onlyMoveAndRotate)
                 ChekIf(line[i]);
-            else if (line[i].Trim().StartsWith("def"))
+            else if (line[i].Trim().StartsWith("def") && !onlyMoveAndRotate)
                 ChekDefinFun(line[i]);
 
 
-            else if (funPieceLine.Length > 1) // Out of Array   ERROR
+            else if (funPieceLine.Length > 1 && !onlyMoveAndRotate) // Out of Array   ERROR
                 ChekCallFun(line[i]);
 
 
             // Variables
-            else if (pieceLine.Length > 1)
+            else if (pieceLine.Length > 1 && !onlyMoveAndRotate)
             {
                 if (pieceLine[1] == "=")
                     ChekVariable(line[i]);
@@ -86,7 +87,6 @@ public class PythonParser : MonoBehaviour
             else if (line[i].Trim() != "")
             {
                 DebugError.HighlightLine(i+1, Er.GetError("Неизвостно"));
-                hasError = true;
             }
         }
 

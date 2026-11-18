@@ -3753,6 +3753,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cdd73ffcf2355947b2dc1065932cc15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PythonParser
+  onlyMoveAndRotate: 1
   holdSpace: {fileID: 2672016751246948783, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   pressL: {fileID: 211698025393270099, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   Er: {fileID: 1491590443}
@@ -4602,7 +4603,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1025536048
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4624,7 +4625,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.5162292, y: 0.4277778}
-  m_AnchoredPosition: {x: 183.99995, y: 41.299988}
+  m_AnchoredPosition: {x: -34.5, y: 16.7}
   m_SizeDelta: {x: 1506, y: 715.60004}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1025536049
@@ -6674,7 +6675,7 @@ MonoBehaviour:
   m_margin: {x: 7.0627937, y: 9.554657, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1395009442
@@ -6737,6 +6738,8 @@ MonoBehaviour:
   - {fileID: 8695504896696736228, guid: 1577f4ef2907ddc4ebca626812224e30, type: 3}
   _robot: {fileID: 543450651684283742}
   _parser: {fileID: 850538346}
+  moveLimitX: {x: 0, y: 0}
+  moveLimitZ: {x: 0, y: 0}
   restartRobTime: 0.5
   restartingRob: 0
   enterMenu: {fileID: 1076717800}
@@ -7765,8 +7768,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 75.667, y: -8.997986}
-  m_SizeDelta: {x: -151.334, y: -17.997}
+  m_AnchoredPosition: {x: 84.80005, y: -13.400024}
+  m_SizeDelta: {x: -151.33398, y: -17.99701}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1589059513
 MonoBehaviour:
@@ -7875,7 +7878,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1599522496
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9899,7 +9902,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &2052071023
@@ -12512,6 +12515,7 @@ MonoBehaviour:
   rotateSpeed: 0.3
   pyro: {fileID: 543450651684283742}
   twisted: {fileID: 0}
+  gManager: {fileID: 1441862595}
   IsBusy: 0
 --- !u!65 &5562458374732511192
 BoxCollider:

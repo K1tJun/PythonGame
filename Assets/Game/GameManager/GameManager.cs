@@ -13,6 +13,11 @@ public class GameManager : MonoBehaviour
     public Transform _robot;
     public PythonParser _parser;
 
+
+    [Header("RobotInfo")]
+    public Vector2 moveLimitX;
+    public Vector2 moveLimitZ;
+    
     [Header("Targets")]
     public float restartRobTime = 0.5f;
     
@@ -76,6 +81,9 @@ public class GameManager : MonoBehaviour
         
         SetLearnText();
         StartCoroutine(StartPanel());
+
+        moveLimitX = sData.limitX;
+        moveLimitZ = sData.limitZ;
     }
 
     void Update()
@@ -103,8 +111,13 @@ public class GameManager : MonoBehaviour
                  _robot.transform.position != sData.robotTargetPosition && 
                  !restartingRob)
         {
-            StartCoroutine(RestartRobot());
+            ResRob();
         }
+    }
+
+    public void ResRob()
+    {
+        StartCoroutine(RestartRobot());
     }
 
 

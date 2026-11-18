@@ -21,6 +21,7 @@ public class PyroController : MonoBehaviour
     [Header("Components")]
     public Transform pyro;
     public Transform twisted;
+    public GameManager gManager;
 
     public bool IsBusy = false;
 
@@ -28,10 +29,24 @@ public class PyroController : MonoBehaviour
 
     private Transform cubeForward;
 
+    
+    
+    public bool CanMove(Vector3 direction)
+    {
+        Vector3 nextPosition = pyro.position + direction;
+        
+        if (nextPosition.x < gManager.moveLimitX.x || nextPosition.x > gManager.moveLimitX.y ||
+            nextPosition.z < gManager.moveLimitZ.x || nextPosition.z > gManager.moveLimitZ.y)
+        {
+            return false;
+        }
+
+        return true;
+    }
 
     public void Move(PyroCommand.MoveDirection dir)
     {
-        if(dir == PyroCommand.MoveDirection.forward)
+        if(dir == PyroCommand.MoveDirection.forward && CanMove(transform.forward))
         {
             if (IsBusy)
                 return;
@@ -47,7 +62,7 @@ public class PyroController : MonoBehaviour
                     IsBusy = false;
                 });
         }
-        else if(dir == PyroCommand.MoveDirection.backward)
+        else if (dir == PyroCommand.MoveDirection.backward && CanMove(-transform.forward))
         {
             if (IsBusy)
                 return;
@@ -63,6 +78,8 @@ public class PyroController : MonoBehaviour
                     IsBusy = false;
                 });
         }
+        else
+            gManager.ResRob();
     }
 
     public void Rotate(PyroCommand.RotateDirection dir)
